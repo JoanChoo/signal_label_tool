@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>胎心率信号标注工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>胎心率信号标注工具</h1>
+            <div class="identity-section">
+                <label>身份选择：</label>
+                <select id="identitySelect">
+                    <option value="">请选择身份</option>
+                    <option value="annotator">标注者</option>
+                    <option value="reviewer">检查者</option>
+                </select>
+            </div>
+        </header>
+
+        <main>
+            <div class="file-section">
+                <div class="file-upload">
+                    <h3>文件管理</h3>
+                    <div class="upload-buttons">
+                        <button id="uploadSingleBtn" class="btn btn-primary">上传单个文件</button>
+                        <button id="uploadFolderBtn" class="btn btn-primary">批量导入文件夹</button>
+                        <input type="file" id="fileInput" accept=".json" style="display: none;">
+                        <input type="file" id="folderInput" webkitdirectory directory multiple accept=".json" style="display: none;">
+                    </div>
+                    <div class="drop-zone" id="dropZone">
+                        <p>拖拽JSON文件到此处</p>
+                    </div>
+                    <div class="label-folder">
+                        <button id="selectLabelFolderBtn" class="btn btn-secondary">选择标签文件夹</button>
+                        <input type="file" id="labelFolderInput" webkitdirectory directory accept=".json" style="display: none;">
+                        <span id="labelFolderPath">未选择标签文件夹</span>
+                    </div>
+                    <div class="file-selector">
+                        <label>选择文件：</label>
+                        <select id="fileSelector"></select>
+                    </div>
+                    <div class="file-navigation">
+                        <button id="prevFileBtn" class="btn btn-secondary">上一个</button>
+                        <span id="currentFileName">未选择文件</span>
+                        <button id="nextFileBtn" class="btn btn-secondary">下一个</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="signal-section">
+                <div class="toolbar">
+                    <div class="zoom-controls">
+                        <button id="zoomInBtn" class="btn btn-tool">放大</button>
+                        <button id="zoomOutBtn" class="btn btn-tool">缩小</button>
+                        <button id="resetZoomBtn" class="btn btn-tool">重置</button>
+                    </div>
+                    <div class="position-indicator">
+                        <span id="positionIndicator">位置: 0%</span>
+                    </div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="signalCanvas"></canvas>
+                </div>
+                <div class="annotation-tools">
+                    <h4>标注工具</h4>
+                    <div class="tool-buttons">
+                        <button class="annotation-btn" data-type="acceleration" style="background-color: #4CAF50;">加速区间</button>
+                        <button class="annotation-btn" data-type="earlyDeceleration" style="background-color: #2196F3;">早期减速</button>
+                        <button class="annotation-btn" data-type="lateDeceleration" style="background-color: #FF9800;">晚期减速</button>
+                        <button class="annotation-btn" data-type="prolongedDeceleration" style="background-color: #9C27B0;">延长减速</button>
+                        <button class="annotation-btn" data-type="variableDeceleration" style="background-color: #F44336;">变异减速</button>
+                        <button class="annotation-btn" data-type="contraction" style="background-color: #FFEB3B; color: #000;">宫缩区间</button>
+                    </div>
+                    <div class="annotation-actions">
+                        <button id="deleteAnnotationBtn" class="btn btn-danger">删除标注</button>
+                        <button id="undoDeleteBtn" class="btn btn-warning">撤销删除</button>
+                        <button id="exportBtn" class="btn btn-success">导出标注</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="patient-info">
+                    <h3>孕妇信息</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>年龄：</label>
+                            <span id="age">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>孕周：</label>
+                            <span id="week">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>孕次：</label>
+                            <span id="pregnancyNumber">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>产次：</label>
+                            <span id="deliveriesNumber">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>糖尿病：</label>
+                            <span id="diabetesType">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>高血压：</label>
+                            <span id="hypertension">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>子痫前期：</label>
+                            <span id="preeclampsia">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>BMI：</label>
+                            <span id="frontBmi">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>身高：</label>
+                            <span id="frontHeight">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>体重：</label>
+                            <span id="frontWeight">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>甲状腺疾病：</label>
+                            <span id="thyroid">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>地中海贫血：</label>
+                            <span id="anemia">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>子宫肌瘤：</label>
+                            <span id="fibroid">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>卵巢囊肿：</label>
+                            <span id="cyst">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>子宫瘢痕：</label>
+                            <span id="scar">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>脐带绕颈：</label>
+                            <span id="cord">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>解读报告</h3>
+                    <div class="report-form">
+                        <div class="form-group">
+                            <label>检查类型：</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="examType" value="NST"> NST</label>
+                                <label><input type="radio" name="examType" value="OCT/CST"> OCT/CST</label>
+                                <label><input type="radio" name="examType" value="其他"> 其他</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>基线胎心率 (bpm)：</label>
+                            <input type="number" id="baselineFHR" placeholder="输入数值">
+                        </div>
+                        <div class="form-group">
+                            <label>基线变异：</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="baselineVariability" value="moderate"> 中等</label>
+                                <label><input type="radio" name="baselineVariability" value="minimal"> 微小</label>
+                                <label><input type="radio" name="baselineVariability" value="marked"> 显著</label>
+                                <label><input type="radio" name="baselineVariability" value="absent"> 无</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>加速评估：</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="acceleration" value="satisfactory"> 加速满意</label>
+                                <label><input type="radio" name="acceleration" value="unsatisfactory"> 加速欠满意</label>
+                                <label><input type="radio" name="acceleration" value="none"> 无加速</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>减速类型：</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" value="none" id="decelerationNone"> 无</label>
+                                <label><input type="checkbox" value="early" id="decelerationEarly"> 早期</label>
+                                <label><input type="checkbox" value="variable" id="decelerationVariable"> 变异</label>
+                                <label><input type="checkbox" value="late" id="decelerationLate"> 晚期</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>宫缩评估：</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="contraction" value="yes"> 有</label>
+                                <label><input type="radio" name="contraction" value="no"> 无</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>综合结论：</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="conclusion" value="normal"> 正常</label>
+                                <label><input type="radio" name="conclusion" value="suspicious"> 可疑</label>
+                                <label><input type="radio" name="conclusion" value="abnormal"> 异常</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>自由文本：</label>
+                            <textarea id="freeText" rows="4" placeholder="输入详细的结论和建议"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="fileManager.js"></script>
+    <script src="signalRenderer.js"></script>
+    <script src="annotationManager.js"></script>
+    <script src="patientInfo.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
